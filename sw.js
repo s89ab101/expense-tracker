@@ -1,5 +1,9 @@
 const CACHE = 'expense-v1';
+// 如果 repository 名稱是 s89ab101（跟帳號同名）
 const FILES = ['/', '/index.html', '/app.js', '/manifest.json'];
+
+// 如果 repository 名稱是 expense-tracker
+const FILES = ['/expense-tracker/', '/expense-tracker/index.html', '/expense-tracker/app.js', '/expense-tracker/manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).catch(() => {}));
