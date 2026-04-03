@@ -2,7 +2,7 @@
   "name": "記帳本 · 台灣",
   "short_name": "記帳本",
   "description": "台灣個人記帳管理 App",
-  "start_url": "/index.html",
+  "start_url": "/expense-tracker/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f6f5f2",
