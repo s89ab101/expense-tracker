@@ -1,4 +1,4 @@
-# 記帳本 · 台灣版 PWA
+# Expense Tracker PWA
 
 ## 安裝到 iOS 主畫面（像 App 一樣使用）
 
@@ -26,11 +26,4 @@
 - ✅ 離線可用（Service Worker）
 - ✅ 資料儲存於裝置本機（localStorage）
 
-## 部署
 
-只需將整個資料夾上傳至任何靜態網站主機，例如：
-- GitHub Pages
-- Netlify
-- Vercel
-
-確保使用 HTTPS，Service Worker 才能正常運作。
