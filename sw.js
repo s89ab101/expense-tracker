@@ -1,9 +1,11 @@
 const CACHE = 'expense-v1';
-// 如果 repository 名稱是 s89ab101（跟帳號同名）
-const FILES = ['/', '/index.html', '/app.js', '/manifest.json'];
-
-// 如果 repository 名稱是 expense-tracker
-const FILES = ['/expense-tracker/', '/expense-tracker/index.html', '/expense-tracker/app.js', '/expense-tracker/manifest.json'];
+const BASE = '/expense-tracker';
+const FILES = [
+  BASE + '/',
+  BASE + '/index.html',
+  BASE + '/app.js',
+  BASE + '/manifest.json',
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).catch(() => {}));
@@ -26,6 +28,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return res;
-    })).catch(() => caches.match('/index.html'))
+    })).catch(() => caches.match(BASE + '/index.html'))
   );
 });
