@@ -1,6 +1,6 @@
 {
-  "name": "記帳本 · 台灣",
-  "short_name": "記帳本",
+  "name": "Expense Tracker",
+  "short_name": "Expense Tracker",
   "description": "台灣個人記帳管理 App",
   "start_url": "/expense-tracker/index.html",
   "display": "standalone",
