@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>登入診斷</title>
+<style>
+body{font-family:sans-serif;padding:20px;background:#1c1c1e;color:#f0f0f0;font-size:14px;}
+.card{background:#2c2c2e;border-radius:12px;padding:16px;margin-bottom:12px;}
+.ok{color:#2fba8c;}
+.err{color:#e06040;}
+.warn{color:#d4860e;}
+.info{color:#4d92d4;}
+button{background:#2fba8c;color:white;border:none;border-radius:12px;padding:14px 24px;font-size:16px;font-weight:700;width:100%;margin-top:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+pre{font-size:11px;white-space:pre-wrap;word-break:break-all;color:#aaa;margin-top:8px;}
+</style>
+</head>
+<body>
+<h2 style="margin-bottom:16px;">🔍 登入診斷工具</h2>
+
+<div class="card">
+  <b>環境資訊</b>
+  <pre id="env-info"></pre>
+</div>
+
+<div class="card">
+  <b>Firebase 載入狀態</b>
+  <pre id="firebase-status">檢測中…</pre>
+</div>
+
+<div class="card">
+  <b>登入測試</b>
+  <button id="test-btn">點我測試登入</button>
+  <pre id="login-result">尚未測試</pre>
+</div>
+
+<div class="card">
+  <b>錯誤記錄</b>
+  <pre id="error-log">無</pre>
+</div>
+
+<script>
+const errors = [];
+const log = document.getElementById('error-log');
+
+window.onerror = (msg, src, line, col, err) => {
+  errors.push(`JS錯誤: ${msg}\n位置: ${src}:${line}`);
+  log.textContent = errors.join('\n\n');
+};
+
+window.addEventListener('unhandledrejection', e => {
+  errors.push(`Promise錯誤: ${e.reason}`);
+  log.textContent = errors.join('\n\n');
+});
+
+// 環境資訊
+document.getElementById('env-info').textContent = [
+  `UA: ${navigator.userAgent}`,
+  `standalone: ${window.navigator.standalone}`,
+  `display-mode standalone: ${window.matchMedia('(display-mode: standalone)').matches}`,
+  `protocol: ${location.protocol}`,
+  `host: ${location.host}`,
+  `localStorage: ${typeof localStorage !== 'undefined' ? 'OK' : '不支援'}`,
+  `ServiceWorker: ${'serviceWorker' in navigator ? 'OK' : '不支援'}`,
+].join('\n');
+
+// Firebase 測試
+async function testFirebase() {
+  const statusEl = document.getElementById('firebase-status');
+  try {
+    statusEl.textContent = '載入 firebase-app…';
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js');
+    statusEl.textContent += '\n✓ firebase-app OK';
+
+    const { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } =
+      await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js');
+    statusEl.textContent += '\n✓ firebase-auth OK';
+
+    const { getFirestore } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
+    statusEl.textContent += '\n✓ firebase-firestore OK';
+
+    const app = initializeApp({
+      apiKey: "AIzaSyD16FMKs6-NDdA8P18jgiL35noGExPRUcM",
+      authDomain: "expense-tracker-d62bc.firebaseapp.com",
+      projectId: "expense-tracker-d62bc",
+      storageBucket: "expense-tracker-d62bc.firebasestorage.app",
+      messagingSenderId: "437530037218",
+      appId: "1:437530037218:web:d8620931a50631bad087bb"
+    });
+    statusEl.textContent += '\n✓ initializeApp OK';
+
+    const auth = getAuth(app);
+    statusEl.textContent += '\n✓ getAuth OK';
+
+    // 檢查 redirect 結果
+    statusEl.textContent += '\n檢查 redirect 結果…';
+    const result = await getRedirectResult(auth);
+    if (result) {
+      statusEl.textContent += `\n✓ redirect 結果: ${result.user.email}`;
+    } else {
+      statusEl.textContent += '\n- 無 redirect 結果（正常，尚未登入）';
+    }
+
+    // 監聽 auth 狀態
+    onAuthStateChanged(auth, user => {
+      statusEl.textContent += `\n✓ Auth 狀態: ${user ? '已登入 ' + user.email : '未登入'}`;
+    });
+
+    // 設定登入按鈕
+    document.getElementById('test-btn').addEventListener('touchstart', async (e) => {
+      e.preventDefault();
+      const resultEl = document.getElementById('login-result');
+      resultEl.textContent = '執行 signInWithRedirect…';
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithRedirect(auth, provider);
+        resultEl.textContent += '\n跳轉中…';
+      } catch(err) {
+        resultEl.textContent = `錯誤:\ncode: ${err.code}\nmsg: ${err.message}`;
+        errors.push(`登入錯誤: ${err.code} - ${err.message}`);
+        log.textContent = errors.join('\n\n');
+      }
+    }, { passive: false });
+
+    document.getElementById('test-btn').addEventListener('click', async () => {
+      const resultEl = document.getElementById('login-result');
+      resultEl.textContent = '執行 signInWithRedirect…';
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithRedirect(auth, provider);
+      } catch(err) {
+        resultEl.textContent = `錯誤:\ncode: ${err.code}\nmsg: ${err.message}`;
+      }
+    });
+
+  } catch(e) {
+    statusEl.textContent += `\n✗ 錯誤: ${e.message}`;
+    errors.push(`Firebase 載入錯誤: ${e.message}`);
+    log.textContent = errors.join('\n\n');
+  }
+}
+
+testFirebase();
+</script>
+</body>
+</html>
