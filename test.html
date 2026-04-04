@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>按鈕測試</title>
+<style>
+body{background:#1c1c1e;color:white;font-family:sans-serif;padding:20px;}
+.log{background:#2c2c2e;border-radius:12px;padding:12px;margin:10px 0;font-size:13px;min-height:60px;}
+button{display:block;width:100%;padding:18px;margin:10px 0;border-radius:14px;border:none;font-size:16px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.btn1{background:#2fba8c;color:white;}
+.btn2{background:#185FA5;color:white;}
+.btn3{background:#D85A30;color:white;}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid #444;background:#2c2c2e;color:white;font-size:15px;margin:8px 0;box-sizing:border-box;}
+</style>
+</head>
+<body>
+<h2>🧪 互動測試</h2>
+<div class="log" id="log">等待操作…</div>
+
+<button class="btn1" id="btn-test1">測試按鈕 1（click）</button>
+<button class="btn2" id="btn-test2">測試按鈕 2（touchend）</button>
+
+<input type="email" id="test-email" placeholder="輸入 Email 測試"/>
+<input type="password" id="test-pass" placeholder="輸入密碼測試"/>
+<button class="btn3" id="btn-submit">模擬登入</button>
+
+<div class="log" id="info"></div>
+
+<script>
+const log = document.getElementById('log');
+let count = 0;
+
+function addLog(msg) {
+  count++;
+  log.innerHTML = `[${count}] ${msg}<br>` + log.innerHTML;
+}
+
+// 測試 click
+document.getElementById('btn-test1').addEventListener('click', function() {
+  addLog('✅ click 事件正常！');
+});
+
+// 測試 touchend
+document.getElementById('btn-test2').addEventListener('touchend', function(e) {
+  e.preventDefault();
+  addLog('✅ touchend 事件正常！');
+}, { passive: false });
+
+// 模擬登入
+document.getElementById('btn-submit').addEventListener('touchend', function(e) {
+  e.preventDefault();
+  const email = document.getElementById('test-email').value;
+  const pass = document.getElementById('test-pass').value;
+  addLog(`登入嘗試: ${email} / ${'*'.repeat(pass.length)}`);
+}, { passive: false });
+
+document.getElementById('btn-submit').addEventListener('click', function() {
+  const email = document.getElementById('test-email').value;
+  const pass = document.getElementById('test-pass').value;
+  addLog(`登入嘗試(click): ${email} / ${'*'.repeat(pass.length)}`);
+});
+
+// 環境資訊
+document.getElementById('info').innerHTML = `
+iOS standalone: ${window.navigator.standalone}<br>
+display-mode: ${window.matchMedia('(display-mode: standalone)').matches}<br>
+Touch支援: ${'ontouchend' in window}<br>
+UA: ${navigator.userAgent.slice(0,80)}
+`;
+</script>
+</body>
+</html>
